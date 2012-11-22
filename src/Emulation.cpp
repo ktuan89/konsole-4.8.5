@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Robert Knight <robertknight@gmail.com> 
+    Copyright 2007-2008 Robert Knight <robertknight@gmail.com>
     Copyright 1997,1998 by Lars Doelle <lars.doelle@on-line.de>
     Copyright 1996 by Matthias Ettrich <ettrich@kde.org>
 
@@ -68,7 +68,7 @@ Emulation::Emulation() :
     QObject::connect(&_bulkTimer2, SIGNAL(timeout()), this, SLOT(showBulk()) );
 
     // listen for mouse status changes
-    connect( this , SIGNAL(programUsesMouseChanged(bool)) , 
+    connect( this , SIGNAL(programUsesMouseChanged(bool)) ,
             SLOT(usesMouseChanged(bool)) );
 }
 
@@ -128,7 +128,7 @@ void Emulation::setScreen(int n)
 {
     Screen* old = _currentScreen;
     _currentScreen = _screen[n & 1];
-    if (_currentScreen != old) 
+    if (_currentScreen != old)
     {
         // tell all windows onto this emulation to switch to the newly active screen
         foreach(ScreenWindow* window,_windows)
@@ -245,6 +245,15 @@ void Emulation::receiveData(const char* text, int length)
 
     QString unicodeText = _decoder->toUnicode(text,length);
 
+    QString zz = m_kt_oldLine + unicodeText;
+    QStringList list = zz.split("\n");
+    for (int ii = 0; ii + 1 < list.size(); ++ii) {
+      emit receiveLine(list[ii]);
+    }
+    if (list.size() != 0) {
+      m_kt_oldLine = list[list.size() - 1];
+    } else m_kt_oldLine = "";
+
     //send characters to terminal emulator
     for (int i=0;i<unicodeText.length();i++)
         receiveChar(unicodeText[i].unicode());
@@ -270,7 +279,7 @@ void Emulation::receiveData(const char* text, int length)
 //
 //There is something about stopping the _decoder if "we get a control code halfway a multi-byte sequence" (see below)
 //which hasn't been ported into the newer function (above).  Hopefully someone who understands this better
-//can find an alternative way of handling the check.  
+//can find an alternative way of handling the check.
 
 
 /*void Emulation::onRcvBlock(const char *s, int len)
@@ -311,9 +320,9 @@ void Emulation::receiveData(const char* text, int length)
   }
 }*/
 
-void Emulation::writeToStream( TerminalCharacterDecoder* decoder , 
+void Emulation::writeToStream( TerminalCharacterDecoder* decoder ,
                                int startLine ,
-                               int endLine) 
+                               int endLine)
 {
     _currentScreen->writeLinesToStream(decoder,startLine,endLine);
 }
@@ -418,17 +427,17 @@ bool ExtendedCharTable::extendedCharMatch(ushort hash , const ushort* unicodePoi
 {
     ushort* entry = extendedCharTable[hash];
 
-    // compare given length with stored sequence length ( given as the first ushort in the 
-    // stored buffer ) 
-    if ( entry == 0 || entry[0] != length ) 
+    // compare given length with stored sequence length ( given as the first ushort in the
+    // stored buffer )
+    if ( entry == 0 || entry[0] != length )
        return false;
     // if the lengths match, each character must be checked.  the stored buffer starts at
     // entry[1]
     for ( int i = 0 ; i < length ; i++ )
     {
         if ( entry[i+1] != unicodePoints[i] )
-           return false; 
-    } 
+           return false;
+    }
     return true;
 }
 ushort ExtendedCharTable::createExtendedChar(const ushort* unicodePoints , ushort length)
@@ -443,7 +452,7 @@ ushort ExtendedCharTable::createExtendedChar(const ushort* unicodePoints , ushor
     {
         if ( extendedCharMatch(hash, unicodePoints, length) )
         {
-            // this sequence already has an entry in the table, 
+            // this sequence already has an entry in the table,
             // return its hash
             return hash;
         }
@@ -492,7 +501,7 @@ ushort ExtendedCharTable::createExtendedChar(const ushort* unicodePoints , ushor
                 }
             }
         }
-    }    
+    }
 
 
     // add the new sequence to the table and
@@ -500,7 +509,7 @@ ushort ExtendedCharTable::createExtendedChar(const ushort* unicodePoints , ushor
     ushort* buffer = new ushort[length+1];
     buffer[0] = length;
     for ( int i = 0 ; i < length ; i++ )
-       buffer[i+1] = unicodePoints[i]; 
+       buffer[i+1] = unicodePoints[i];
 
     extendedCharTable.insert(hash,buffer);
 

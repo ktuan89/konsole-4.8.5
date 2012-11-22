@@ -104,6 +104,10 @@ void Part::setupActionsForSession(SessionController* session)
 {
     // TODO: what meaningful operation should be placed here?
     Q_UNUSED(session);
+    connect(
+        session->session()->emulation(), SIGNAL(receiveLine(const QString&)),
+        this, SIGNAL(receiveLine(const QString&))
+    );
 }
 bool Part::openFile()
 {
@@ -215,6 +219,12 @@ void Part::activeViewChanged(SessionController* controller)
     // remove existing controller
     if (_pluggedController)
     {
+
+        disconnect(
+          _pluggedController->session()->emulation(), SIGNAL(receiveLine(const QString&)),
+          this, SIGNAL(receiveLine(const QString&))
+        );
+
         removeChildClient (_pluggedController);
         disconnect(_pluggedController,SIGNAL(titleChanged(ViewProperties*)),this,
                     SLOT(activeViewTitleChanged(ViewProperties*)));

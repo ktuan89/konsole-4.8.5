@@ -50,23 +50,23 @@ class TerminalCharacterDecoder;
  *
  * These are the values used by Emulation::stateChanged()
  */
-enum 
-{ 
+enum
+{
     /** The emulation is currently receiving user input. */
-    NOTIFYNORMAL=0, 
+    NOTIFYNORMAL=0,
     /**
      * The terminal program has triggered a bell event
      * to get the user's attention.
      */
-    NOTIFYBELL=1, 
+    NOTIFYBELL=1,
     /**
      * The emulation is currently receiving data from its
      * terminal input.
      */
     NOTIFYACTIVITY=2,
 
-    // unused here? 
-    NOTIFYSILENCE=3 
+    // unused here?
+    NOTIFYSILENCE=3
 };
 
 /**
@@ -264,6 +264,8 @@ public slots:
 
 signals:
 
+  void receiveLine(const QString &line);
+
   /**
    * Emitted when a buffer of data is ready to send to the
    * standard input of the terminal.
@@ -435,7 +437,7 @@ protected:
    *
    * @param index 0 to switch to the primary screen, or 1 to switch to the alternate screen
    */
-  void setScreen(int index); 
+  void setScreen(int index);
 
   enum EmulationCodec
   {
@@ -480,7 +482,7 @@ private slots:
 
   // triggered by timer, causes the emulation to send an updated screen image to each
   // view
-  void showBulk(); 
+  void showBulk();
 
   void usesMouseChanged(bool usesMouse);
 
@@ -489,6 +491,7 @@ private:
   QTimer _bulkTimer1;
   QTimer _bulkTimer2;
   bool _imageSizeInitialized;
+  QString m_kt_oldLine;
 
 };
 

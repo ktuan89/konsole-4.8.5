@@ -129,6 +129,9 @@ public slots:
     void setMonitorActivityEnabled(bool enabled);
 
 signals:
+
+    void receiveLine(const QString&);
+
     /**
      * Emitted when the key sequence for a shortcut, which is also a valid terminal key sequence,
      * is pressed while the terminal has focus.  By responding to this signal, the
